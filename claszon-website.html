@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLASZON — Competitive Esports Tournament App & Web Arena</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            esports: ['Rajdhani', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            obsidian: '#09090E',
+            surface: '#11121B',
+            surfaceLight: '#181A27',
+            ember: '#F59E0B',
+            emberLight: '#FBBF24',
+            indigoGlow: '#6366F1',
+            emeraldWin: '#10B981',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #09090E;
+      color: #F8FAFC;
+      overflow-x: hidden;
+    }
+    .diag-mesh {
+      background-image:
+        linear-gradient(135deg, rgba(245, 158, 11, 0.045) 1px, transparent 1px),
+        linear-gradient(45deg, rgba(99, 102, 241, 0.045) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .amber-glow {
+      box-shadow: 0 12px 34px -6px rgba(245, 158, 11, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+    .indigo-glow {
+      box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.38);
+    }
+    .phone-tilt {
+      transform: perspective(1200px) rotateY(-10deg) rotateX(4deg);
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .phone-tilt:hover {
+      transform: perspective(1200px) rotateY(-3deg) rotateX(1deg) translateY(-4px);
+    }
+    @media (max-width: 1023px) {
+      .phone-tilt { transform: none; }
+      .phone-tilt:hover { transform: translateY(-3px); }
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+    .float-slow { animation: floatSlow 4.5s ease-in-out infinite; }
+    .float-slow-delayed { animation: floatSlow 5.2s ease-in-out 1.4s infinite; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #0E1018; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #272A3E; border-radius: 999px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #F59E0B; }
+  </style>
+</head>
+<body class="diag-mesh min-h-screen flex flex-col relative selection:bg-amber-500/30 selection:text-amber-200">
+
+  <div class="pointer-events-none fixed -top-36 -left-24 w-[460px] h-[460px] rounded-full bg-amber-500/10 blur-[130px] z-0"></div>
+  <div class="pointer-events-none fixed top-1/3 -right-28 w-[440px] h-[440px] rounded-full bg-indigo-500/12 blur-[140px] z-0"></div>
+
+  <header class="sticky top-0 z-40 border-b border-white/[0.07] bg-[#09090E]/85 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between gap-3">
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600 p-[1.5px] shadow-lg shadow-amber-500/20">
+          <div class="w-full h-full rounded-[10px] bg-[#0E0F17] flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.5l8 4.6v9.8l-8 4.6-8-4.6V7.1l8-4.6z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.5 9.5A3.5 3.5 0 1 0 14.5 14.5" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.5 7.5l2.5 1.8 2.5-1.8" />
+            </svg>
+          </div>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="font-display font-extrabold text-xl tracking-wider text-white group-hover:text-amber-300 transition-colors">CLASZON</span>
+          <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-amber-400/90 mt-0.5">Esports Arena</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300">
+        <a href="#tournaments" class="hover:text-amber-400 transition-colors">Tournaments</a>
+        <a href="#webview-showcase" class="hover:text-indigo-400 transition-colors">Web View</a>
+        <a href="#install-guide" class="hover:text-amber-400 transition-colors">Install APK</a>
+        <a href="#faq" class="hover:text-amber-400 transition-colors">FAQ</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="openWebViewModal('iframe')" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold border border-indigo-400/35 bg-indigo-500/10 text-indigo-200 hover:bg-indigo-500/20 transition cursor-pointer">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          Web View
+        </button>
+        <button onclick="openApkModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition cursor-pointer shadow-md shadow-amber-500/20">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+          </svg>
+          Get APK
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative z-10 flex-1">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 lg:pt-16 lg:pb-24">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+
+        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface border border-amber-500/25 text-xs font-semibold tracking-wider uppercase text-amber-300">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+            </span>
+            Season 04 Live • Custom Rooms Open Every 20 Mins
+          </div>
+
+          <div class="space-y-2">
+            <h1 class="font-esports font-bold text-5xl sm:text-6xl xl:text-7xl tracking-tight leading-[0.96] uppercase">
+              <span class="block text-white">CLASZON</span>
+              <span class="block bg-gradient-to-r from-amber-300 via-amber-500 to-indigo-400 bg-clip-text text-transparent">
+                COMPETE & WIN
+              </span>
+            </h1>
+            <p class="font-display text-xs sm:text-sm font-bold tracking-[0.24em] uppercase text-slate-400 pt-1">
+              Skill-Based Mobile Esports • Instant Room ID & Password • Fast UPI Payouts
+            </p>
+          </div>
+
+          <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            Join high-stakes <strong class="text-white font-semibold">Free Fire MAX</strong>, <strong class="text-white font-semibold">BGMI</strong>, and <strong class="text-white font-semibold">Clash Squad</strong> brackets on <strong class="text-amber-400 font-semibold">Claszon</strong>. Download the verified Android APK for full push alerts, or launch <strong class="text-indigo-300 font-semibold">Web View</strong> to play right inside your browser.
+          </p>
+
+          <div class="space-y-3 pt-1 max-w-xl mx-auto lg:mx-0">
+            <button onclick="openApkModal()" class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-display font-extrabold text-base sm:text-lg tracking-wide uppercase flex items-center justify-center gap-3 amber-glow transition-all active:scale-[0.99] cursor-pointer">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67c-.19-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85L6.4 9.48A10.78 10.78 0 0 0 2 18h20a10.78 10.78 0 0 0-4.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+              </svg>
+              <span>Download Android APK</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-950/20 text-slate-950" data-apk-size>45.1 MB</span>
+            </button>
+
+            <button onclick="openWebViewModal('iframe')" class="w-full py-3.5 px-6 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-400/45 text-white font-display font-bold text-sm sm:text-base tracking-wide uppercase flex items-center justify-center gap-3 indigo-glow transition-all active:scale-[0.99] cursor-pointer">
+              <svg class="w-5 h-5 text-indigo-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3.6 9h16.8M3.6 15h16.8" />
+                <path d="M12 3a14.5 14.5 0 0 0 0 18 14.5 14.5 0 0 0 0-18z" />
+              </svg>
+              <span>Play on Web (Web View)</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">LIVE VIEW</span>
+            </button>
+
+            <button onclick="openIosModal()" class="w-full py-3.5 px-6 rounded-xl bg-surface hover:bg-surfaceLight border border-white/10 text-slate-300 hover:text-white font-display font-bold text-sm sm:text-base tracking-wide uppercase flex items-center justify-between px-5 transition-all cursor-pointer">
+              <span class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-slate-300 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z"/>
+                </svg>
+                <span>iOS / iPhone App Download</span>
+              </span>
+              <span class="text-[11px] font-extrabold tracking-wider px-2.5 py-1 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                COMING SOON
+              </span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 sm:gap-5 pt-4 border-t border-white/[0.08] max-w-xl mx-auto lg:mx-0">
+            <div class="bg-surface/80 border border-white/[0.06] rounded-xl p-3 sm:p-3.5 text-left">
+              <div class="font-esports font-bold text-2xl sm:text-3xl text-white">185K<span class="text-amber-400">+</span></div>
+              <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mt-0.5">Active Players</div>
+            </div>
+            <div class="bg-surface/80 border border-white/[0.06] rounded-xl p-3 sm:p-3.5 text-left">
+              <div class="font-esports font-bold text-2xl sm:text-3xl text-white">14.2K<span class="text-indigo-400">+</span></div>
+              <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mt-0.5">Matches Hosted</div>
+            </div>
+            <div class="bg-surface/80 border border-white/[0.06] rounded-xl p-3 sm:p-3.5 text-left">
+              <div class="font-esports font-bold text-2xl sm:text-3xl text-emerald-400">₹8.6L<span class="text-amber-400">+</span></div>
+              <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mt-0.5">Rewards Paid</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 relative flex justify-center items-center">
+          <div class="hidden sm:flex float-slow absolute -left-2 lg:-left-6 top-10 z-20 items-center gap-2.5 bg-[#131522]/95 border border-emerald-400/30 backdrop-blur-md px-3.5 py-2.5 rounded-2xl shadow-2xl">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold text-sm">₹</div>
+            <div>
+              <div class="text-xs font-bold text-white">Instant UPI Payout</div>
+              <div class="text-[10px] text-emerald-300/90">Verified Match Results</div>
+            </div>
+          </div>
+
+          <div class="hidden sm:flex float-slow-delayed absolute -right-2 lg:-right-5 bottom-14 z-20 items-center gap-2.5 bg-[#131522]/95 border border-indigo-400/35 backdrop-blur-md px-3.5 py-2.5 rounded-2xl shadow-2xl">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">Web View Ready</div>
+              <div class="text-[10px] text-indigo-300">Zero Lag Browser Mode</div>
+            </div>
+          </div>
+
+          <div class="phone-tilt w-[300px] sm:w-[325px] rounded-[38px] bg-[#121420] border-[3px] border-white/15 p-3 shadow-[0_28px_70px_rgba(0,0,0,0.75)]">
+            <div class="rounded-[29px] bg-[#090A10] overflow-hidden border border-white/[0.06]">
+              <div class="px-5 pt-3 pb-2 flex items-center justify-between text-[11px] font-semibold text-slate-400">
+                <span>9:41</span>
+                <span class="w-16 h-4 rounded-full bg-[#161826] border border-white/10"></span>
+                <span class="text-emerald-400">5G</span>
+              </div>
+
+              <div class="px-4 py-2.5 flex items-center justify-between border-b border-white/[0.06] bg-surface/70">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                  <span class="font-display font-bold text-xs tracking-wider uppercase text-white">CLASZON LOBBY</span>
+                </div>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  Wallet ₹420
+                </span>
+              </div>
+
+              <div class="p-3.5 space-y-3">
+                <div class="rounded-2xl p-3.5 bg-gradient-to-br from-amber-500/20 via-surface to-indigo-600/20 border border-amber-400/25">
+                  <div class="flex items-center justify-between text-[10px] uppercase tracking-wider font-bold">
+                    <span class="text-amber-300">Featured Scrim</span>
+                    <span class="text-emerald-300">Starts in 12m</span>
+                  </div>
+                  <div class="font-esports font-bold text-xl text-white mt-1">BERMUDA SQUAD CHAMPIONSHIP</div>
+                  <div class="flex items-center justify-between mt-2.5 text-xs">
+                    <span class="text-slate-300">Prize: <strong class="text-amber-400">₹5,000</strong></span>
+                    <span class="text-slate-300">Entry: <strong class="text-white">₹30</strong></span>
+                  </div>
+                  <div class="mt-2.5 w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div class="w-4/5 h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>38 / 48 Slots Filled</span>
+                    <span>10 Slots Left</span>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-xl bg-surface border border-white/[0.06] flex items-center justify-between">
+                    <div>
+                      <div class="text-xs font-bold text-white">BGMI Erangel Solo Rush</div>
+                      <div class="text-[10px] text-slate-400">₹15 / Kill • Win ₹1,800</div>
+                    </div>
+                    <button onclick="openWebViewModal('iframe')" class="px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/35 text-indigo-200 text-[11px] font-bold border border-indigo-400/30 cursor-pointer">
+                      Join
+                    </button>
+                  </div>
+
+                  <div class="p-2.5 rounded-xl bg-surface border border-white/[0.06] flex items-center justify-between">
+                    <div>
+                      <div class="text-xs font-bold text-white">Clash Squad 4v4 Pro</div>
+                      <div class="text-[10px] text-slate-400">Best of 3 • Prize ₹1,200</div>
+                    </div>
+                    <button onclick="openWebViewModal('iframe')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 text-amber-200 text-[11px] font-bold border border-amber-400/30 cursor-pointer">
+                      Join
+                    </button>
+                  </div>
+                </div>
+
+                <button onclick="openWebViewModal('iframe')" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-display font-bold text-xs uppercase tracking-wider transition cursor-pointer">
+                  Open Full Web View Arena →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="tournaments" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-white/[0.07]">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">Live Match Schedule</span>
+          <h2 class="font-esports font-bold text-3xl sm:text-4xl uppercase text-white mt-1">Active Tournament Rooms</h2>
+        </div>
+
+        <div class="inline-flex p-1 rounded-xl bg-surface border border-white/10 self-start">
+          <button onclick="filterMatches('ALL')" data-filter="ALL" class="match-tab px-3.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition cursor-pointer">All Modes</button>
+          <button onclick="filterMatches('FF')" data-filter="FF" class="match-tab px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">Free Fire</button>
+          <button onclick="filterMatches('BGMI')" data-filter="BGMI" class="match-tab px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">BGMI</button>
+          <button onclick="filterMatches('CS')" data-filter="CS" class="match-tab px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">Clash Squad</button>
+        </div>
+      </div>
+
+      <div id="matchGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </section>
+
+    <section id="webview-showcase" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-white/[0.07]">
+      <div class="rounded-3xl bg-gradient-to-br from-[#121422] via-surface to-[#11152B] border border-indigo-400/20 p-6 sm:p-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-4">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-xs font-bold uppercase tracking-wider">
+              Browser Web View Mode
+            </span>
+            <h2 class="font-esports font-bold text-3xl sm:text-4xl uppercase text-white">
+              Play & Check Brackets Directly in <span class="text-indigo-400">Web View</span>
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Don’t have storage space for an APK right now or testing on a desktop? Launch <strong class="text-white">Web View</strong> to load your live Claszon web app directly inside an embedded frame with instant <strong class="text-indigo-300">Mobile</strong> and <strong class="text-amber-300">Desktop</strong> viewport switching.
+            </p>
+            <div class="flex flex-wrap gap-3 pt-2">
+              <button onclick="openWebViewModal('iframe')" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-display font-bold text-sm uppercase tracking-wide transition cursor-pointer shadow-lg shadow-indigo-600/25">
+                Launch Web View Now
+              </button>
+              <button onclick="openWebViewModal('demo')" class="px-5 py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-slate-200 font-display font-bold text-sm uppercase tracking-wide transition cursor-pointer">
+                Preview Interactive Lobby
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-[#0B0D16]/90 border border-white/[0.07]">
+              <div class="text-amber-400 font-esports font-bold text-xl">01 / INSTANT LOAD</div>
+              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">Loads your configured Web View URL smoothly inside a responsive frame without installing a file.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-[#0B0D16]/90 border border-white/[0.07]">
+              <div class="text-indigo-400 font-esports font-bold text-xl">02 / FRAME TOGGLE</div>
+              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">Switch between Mobile App frame and Wide Desktop view anytime while inside Web View.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-[#0B0D16]/90 border border-white/[0.07]">
+              <div class="text-emerald-400 font-esports font-bold text-xl">03 / ROOM CREDENTIALS</div>
+              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">View match timings, slot availability, and tournament rules before custom room IDs drop.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-[#0B0D16]/90 border border-white/[0.07]">
+              <div class="text-amber-300 font-esports font-bold text-xl">04 / SEAMLESS APK</div>
+              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">Upgrade to the full Android APK anytime with one click for background notifications.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install-guide" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-white/[0.07]">
+      <div class="mb-8">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">Quick Setup</span>
+        <h2 class="font-esports font-bold text-3xl sm:text-4xl uppercase text-white mt-1">How to Install Claszon APK</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="p-6 rounded-2xl bg-surface border border-white/[0.07]">
+          <div class="w-9 h-9 rounded-lg bg-amber-500/15 border border-amber-400/30 text-amber-300 font-display font-extrabold flex items-center justify-center mb-4">1</div>
+          <h3 class="font-display font-bold text-lg text-white">Download APK File</h3>
+          <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">Tap <strong class="text-slate-200">Download Android APK</strong> to fetch the latest Claszon installer package directly to your device.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-surface border border-white/[0.07]">
+          <div class="w-9 h-9 rounded-lg bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 font-display font-extrabold flex items-center justify-center mb-4">2</div>
+          <h3 class="font-display font-bold text-lg text-white">Allow Browser Install</h3>
+          <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">When prompted by Android, enable <strong class="text-slate-200">Install unknown apps</strong> for your browser and tap Install.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-surface border border-white/[0.07]">
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 font-display font-extrabold flex items-center justify-center mb-4">3</div>
+          <h3 class="font-display font-bold text-lg text-white">Register & Compete</h3>
+          <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">Sign in with your player profile, pick a tournament bracket, and receive room ID & password on time.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-white/[0.07]">
+      <div class="text-center mb-8">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Support & Info</span>
+        <h2 class="font-esports font-bold text-3xl sm:text-4xl uppercase text-white mt-1">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="space-y-3">
+        <details class="group rounded-2xl bg-surface border border-white/[0.07] p-5" open>
+          <summary class="list-none flex items-center justify-between font-display font-bold text-white cursor-pointer">
+            <span>What is the difference between the Android APK and Web View?</span>
+            <span class="text-amber-400 group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+          </summary>
+          <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+            The Android APK installs the full native experience on your phone, while <strong class="text-slate-200">Web View</strong> lets you open and interact with your Claszon web app straight inside the browser window.
+          </p>
+        </details>
+
+        <details class="group rounded-2xl bg-surface border border-white/[0.07] p-5">
+          <summary class="list-none flex items-center justify-between font-display font-bold text-white cursor-pointer">
+            <span>When will the iOS / iPhone app be available?</span>
+            <span class="text-amber-400 group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+          </summary>
+          <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+            The iOS build is marked <strong class="text-amber-300">Coming Soon</strong>. iPhone users can join the waitlist or use <strong class="text-indigo-300">Web View</strong> in Safari in the meantime.
+          </p>
+        </details>
+
+        <details class="group rounded-2xl bg-surface border border-white/[0.07] p-5">
+          <summary class="list-none flex items-center justify-between font-display font-bold text-white cursor-pointer">
+            <span>How do I update my APK link or Web View URL later?</span>
+            <span class="text-amber-400 group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+          </summary>
+          <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+            Open <code class="text-amber-300">index.html</code>, find <code class="text-indigo-300">CLASZON_CONFIG</code> near the bottom script, and update <code class="text-amber-300">apkUrl</code> and <code class="text-indigo-300">webViewUrl</code>.
+          </p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/[0.07] bg-[#07080D] py-8 px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div class="flex items-center gap-2.5">
+        <span class="font-display font-extrabold text-sm tracking-wider text-white">CLASZON</span>
+        <span>•</span>
+        <span>Competitive Gaming & Tournament Platform</span>
+      </div>
+      <div class="flex items-center gap-5">
+        <a id="footerTelegramLink" href="https://t.me/your_channel" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400 transition">Telegram</a>
+        <a id="footerWhatsappLink" href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition">WhatsApp Support</a>
+        <button onclick="openWebViewModal('iframe')" class="hover:text-indigo-400 transition cursor-pointer">Web View</button>
+      </div>
+    </div>
+  </footer>
+
+  <a id="floatingWhatsappBtn" href="https://wa.me/919999999999?text=Hello%20Claszon%20Support%2C%20I%20need%20help%20with%20the%20app." target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" class="fixed bottom-5 right-5 z-40 w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center shadow-xl shadow-emerald-500/30 transition hover:scale-105">
+    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.763.461 3.483 1.336 5.002L2 22l5.141-1.348a9.93 9.93 0 0 0 4.89 1.248h.004c5.515 0 9.969-4.453 9.969-9.969 0-2.664-1.037-5.169-2.921-7.053A9.914 9.914 0 0 0 12.031 2zm5.822 14.122c-.244.686-1.415 1.312-1.946 1.391-.52.078-1.164.111-1.871-.118-.431-.139-.985-.321-1.693-.627-2.977-1.286-4.922-4.274-5.071-4.472-.149-.198-1.213-1.613-1.213-3.077 0-1.464.767-2.184 1.039-2.482.272-.298.594-.372.792-.372.198 0 .396.002.57.01.183.009.428-.069.67.511.244.58.831 2.028.904 2.177.074.149.124.323.025.521-.099.198-.149.323-.297.496-.149.174-.313.388-.447.521-.149.148-.304.309-.131.606.174.297.772 1.273 1.657 2.062 1.138 1.015 2.097 1.33 2.395 1.479.297.149.471.124.644-.074.174-.198.744-.867.942-1.165.198-.298.396-.248.669-.149.273.099 1.734.818 2.031.967.298.149.496.223.57.347.074.124.074.719-.17 1.405z"/>
+    </svg>
+  </a>
+
+  <div id="apkModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-2xl bg-[#121421] border border-amber-400/25 p-6 shadow-2xl relative">
+      <button onclick="closeApkModal()" aria-label="Close modal" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center cursor-pointer">✕</button>
+
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-bold mb-3">
+        <span>✓</span> Verified Release Package
+      </div>
+
+      <h3 class="font-esports font-bold text-2xl uppercase text-white">Download Claszon APK</h3>
+      <p class="text-xs sm:text-sm text-slate-400 mt-1">
+        Version <strong class="text-white" data-apk-version>v2.4</strong> • Size <strong class="text-amber-300" data-apk-size>45.1 MB</strong> • Android 8.0+
+      </p>
+
+      <div class="mt-4 p-3.5 rounded-xl bg-[#0A0C14] border border-white/[0.07] space-y-1.5 text-xs text-slate-300">
+        <div class="flex justify-between"><span class="text-slate-400">Package Name:</span><span class="font-mono text-amber-300">com.claszon.esports</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Web View Mode:</span><span class="text-indigo-300 font-semibold">Also Available in Browser</span></div>
+      </div>
+
+      <div class="mt-5 flex flex-col gap-2.5">
+        <a id="directApkDownloadBtn" href="#" download class="w-full py-3.5 px-5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-display font-extrabold text-sm uppercase tracking-wider text-center transition">
+          Start APK Download
+        </a>
+        <button onclick="closeApkModal(); openWebViewModal('iframe');" class="w-full py-2.5 px-5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-400/35 text-indigo-200 font-display font-bold text-xs uppercase tracking-wider transition cursor-pointer">
+          Open Web View Instead
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="iosModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-2xl bg-[#121421] border border-white/15 p-6 shadow-2xl relative">
+      <button onclick="closeIosModal()" aria-label="Close iOS modal" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center cursor-pointer">✕</button>
+
+      <span class="inline-block px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
+        iOS / iPhone • Coming Soon
+      </span>
+      <h3 class="font-esports font-bold text-2xl uppercase text-white">Claszon for iPhone</h3>
+      <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">
+        Our native iOS build is currently in preparation. Enter your email or contact handle to get notified on launch, or use <strong class="text-indigo-300">Web View</strong> right now.
+      </p>
+
+      <form onsubmit="handleIosWaitlist(event)" class="mt-4 space-y-3">
+        <input id="iosContactInput" type="text" required placeholder="Enter email or Telegram @username" class="w-full px-4 py-3 rounded-xl bg-[#0A0C14] border border-white/10 focus:border-amber-400 outline-none text-sm text-white placeholder:text-slate-500" />
+        <button type="submit" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-display font-extrabold text-sm uppercase tracking-wider transition cursor-pointer">
+          Notify Me When Live
+        </button>
+      </form>
+      <p id="iosWaitlistMsg" class="hidden text-xs text-emerald-400 mt-3 font-medium"></p>
+    </div>
+  </div>
+
+  <div id="webviewModal" class="fixed inset-0 z-50 hidden flex-col bg-[#07080E]/95 backdrop-blur-md">
+    <div class="h-14 sm:h-16 px-3 sm:px-6 border-b border-white/10 bg-[#0E101A] flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse shrink-0"></span>
+        <span class="font-display font-bold text-sm sm:text-base uppercase tracking-wider text-white truncate">Claszon Web View</span>
+        <span id="webviewUrlBadge" class="hidden md:inline-block text-xs font-mono px-2.5 py-0.5 rounded bg-white/5 text-slate-400 truncate max-w-xs"></span>
+      </div>
+
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <div class="hidden sm:flex rounded-lg bg-[#08090F] p-0.5 border border-white/10 text-xs font-semibold">
+          <button id="modeIframeBtn" onclick="setWebViewSource('iframe')" class="px-2.5 py-1 rounded-md bg-indigo-600 text-white cursor-pointer">Web URL</button>
+          <button id="modeDemoBtn" onclick="setWebViewSource('demo')" class="px-2.5 py-1 rounded-md text-slate-300 hover:text-white cursor-pointer">Demo Lobby</button>
+        </div>
+
+        <div class="hidden lg:flex rounded-lg bg-[#08090F] p-0.5 border border-white/10 text-xs font-semibold">
+          <button id="frameMobileBtn" onclick="setViewportFrame('mobile')" class="px-2.5 py-1 rounded-md text-slate-300 hover:text-white cursor-pointer">Mobile</button>
+          <button id="frameDesktopBtn" onclick="setViewportFrame('desktop')" class="px-2.5 py-1 rounded-md bg-white/10 text-white cursor-pointer">Desktop</button>
+        </div>
+
+        <a id="openExternalWebViewBtn" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 border border-white/10">
+          New Tab ↗
+        </a>
+        <button onclick="closeWebViewModal()" aria-label="Close Web View" class="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
+          Close ✕
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 p-3 sm:p-5 overflow-auto flex items-center justify-center">
+      <div id="webviewFrameContainer" class="w-full h-full max-w-6xl rounded-2xl overflow-hidden border border-indigo-400/25 bg-[#0B0D16] shadow-2xl transition-all duration-300">
+        <iframe id="webviewIframe" src="" title="Claszon Web View" class="w-full h-full border-0 hidden" allowfullscreen></iframe>
+
+        <div id="webviewDemoView" class="w-full h-full overflow-y-auto custom-scroll p-5 sm:p-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Interactive Web View Preview</span>
+              <h4 class="font-esports font-bold text-2xl sm:text-3xl uppercase text-white">Claszon Browser Arena</h4>
+            </div>
+            <p class="text-xs text-slate-400">Set <code class="text-amber-300">webViewUrl</code> in <code class="text-indigo-300">CLASZON_CONFIG</code> to load your live web app automatically.</p>
+          </div>
+          <div id="demoMatchesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CLASZON_CONFIG = {
+      brandName: "CLASZON",
+      apkVersion: "v2.4",
+      apkSize: "45.1 MB",
+      apkUrl: "https://github.com/newtonlofi34-alt/claszon-app/releases/download/V2.4/DOC-20261125-WA0001.apk",
+      webViewUrl: "https://newtonlofi34-alt.github.io/claszon-app/",
+      whatsappNumber: "919999999999",
+      telegramUrl: "https://t.me/your_channel"
+    };
+
+    const MATCHES = [
+      { id: 1, mode: "FF", badge: "Free Fire MAX • Squad", title: "Bermuda Pro Scrims #402", prize: "₹5,000", entry: "₹30", time: "Today • 06:30 PM", slots: "38/48" },
+      { id: 2, mode: "BGMI", badge: "BGMI • Solo Rush", title: "Erangel Kill Feast #118", prize: "₹2,400", entry: "₹20", time: "Today • 07:45 PM", slots: "64/100" },
+      { id: 3, mode: "CS", badge: "Clash Squad • 4v4", title: "Factory Challenge Cup", prize: "₹1,500", entry: "₹25", time: "Today • 09:00 PM", slots: "12/16" },
+      { id: 4, mode: "FF", badge: "Free Fire MAX • Duo", title: "Purgatory Duo Showdown", prize: "₹3,000", entry: "₹20", time: "Tomorrow • 05:00 PM", slots: "19/24" },
+      { id: 5, mode: "BGMI", badge: "BGMI • Squad", title: "Miramar Championship", prize: "₹7,500", entry: "₹50", time: "Tomorrow • 08:15 PM", slots: "16/25" },
+      { id: 6, mode: "CS", badge: "Clash Squad • 4v4", title: "Midnight Ranked Clash", prize: "₹2,000", entry: "₹30", time: "Tomorrow • 10:00 PM", slots: "8/16" }
+    ];
+
+    function applyConfig() {
+      document.querySelectorAll("[data-apk-size]").forEach(el => {
+        el.textContent = CLASZON_CONFIG.apkSize;
+      });
+      document.querySelectorAll("[data-apk-version]").forEach(el => {
+        el.textContent = CLASZON_CONFIG.apkVersion;
+      });
+
+      const apkBtn = document.getElementById("directApkDownloadBtn");
+      if (apkBtn) apkBtn.href = CLASZON_CONFIG.apkUrl;
+
+      const waUrl = `https://wa.me/${CLASZON_CONFIG.whatsappNumber}?text=Hi%20${encodeURIComponent(CLASZON_CONFIG.brandName)}%20Team%2C%20I%20need%20help.`;
+      const floatWa = document.getElementById("floatingWhatsappBtn");
+      const footerWa = document.getElementById("footerWhatsappLink");
+      const footerTg = document.getElementById("footerTelegramLink");
+      if (floatWa) floatWa.href = waUrl;
+      if (footerWa) footerWa.href = waUrl;
+      if (footerTg) footerTg.href = CLASZON_CONFIG.telegramUrl;
+
+      const urlBadge = document.getElementById("webviewUrlBadge");
+      const extBtn = document.getElementById("openExternalWebViewBtn");
+      if (urlBadge) urlBadge.textContent = CLASZON_CONFIG.webViewUrl || "Demo Mode";
+      if (extBtn) extBtn.href = CLASZON_CONFIG.webViewUrl || "#webview-showcase";
+    }
+
+    function renderMatches(filter = "ALL") {
+      const grid = document.getElementById("matchGrid");
+      if (!grid) return;
+      const items = filter === "ALL" ? MATCHES : MATCHES.filter(m => m.mode === filter);
+
+      grid.innerHTML = items.map(m => `
+        <div class="rounded-2xl bg-surface border border-white/[0.08] hover:border-amber-400/40 p-5 flex flex-col justify-between transition">
+          <div>
+            <div class="flex items-center justify-between gap-2 text-xs">
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-bold">${m.badge}</span>
+              <span class="text-slate-400">${m.time}</span>
+            </div>
+            <h3 class="font-esports font-bold text-2xl text-white mt-3">${m.title}</h3>
+            <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/[0.06] text-xs">
+              <div><div class="text-slate-400">Prize Pool</div><div class="font-bold text-emerald-400 text-sm mt-0.5">${m.prize}</div></div>
+              <div><div class="text-slate-400">Entry Fee</div><div class="font-bold text-white text-sm mt-0.5">${m.entry}</div></div>
+              <div><div class="text-slate-400">Slots</div><div class="font-bold text-indigo-300 text-sm mt-0.5">${m.slots}</div></div>
+            </div>
+          </div>
+          <button onclick="openWebViewModal('iframe')" class="mt-5 w-full py-2.5 rounded-xl bg-white/[0.05] hover:bg-amber-500 hover:text-slate-950 text-white font-display font-bold text-xs uppercase tracking-wider transition cursor-pointer">
+            Join via Web View
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function filterMatches(mode) {
+      document.querySelectorAll(".match-tab").forEach(btn => {
+        const active = btn.dataset.filter === mode;
+        btn.className = active
+          ? "match-tab px-3.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition cursor-pointer"
+          : "match-tab px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer";
+      });
+      renderMatches(mode);
+    }
+
+    function renderDemoMatches() {
+      const container = document.getElementById("demoMatchesContainer");
+      if (!container) return;
+      container.innerHTML = MATCHES.slice(0, 4).map(m => `
+        <div class="p-4 rounded-2xl bg-surface border border-white/10 flex flex-col justify-between gap-3">
+          <div>
+            <div class="flex justify-between text-xs text-slate-400">
+              <span class="text-indigo-300 font-semibold">${m.badge}</span>
+              <span>${m.time}</span>
+            </div>
+            <div class="font-esports font-bold text-xl text-white mt-1">${m.title}</div>
+          </div>
+          <div class="flex items-center justify-between text-xs pt-2 border-t border-white/10">
+            <span class="text-emerald-400 font-bold">Prize: ${m.prize}</span>
+            <span class="text-slate-300">Entry: ${m.entry} • Slots: ${m.slots}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function openApkModal() {
+      const modal = document.getElementById("apkModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeApkModal() {
+      const modal = document.getElementById("apkModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function openIosModal() {
+      const modal = document.getElementById("iosModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeIosModal() {
+      const modal = document.getElementById("iosModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function handleIosWaitlist(e) {
+      e.preventDefault();
+      const input = document.getElementById("iosContactInput");
+      const msg = document.getElementById("iosWaitlistMsg");
+      if (input && msg && input.value.trim()) {
+        msg.textContent = `Saved "${input.value.trim()}" for Claszon iOS launch alerts.`;
+        msg.classList.remove("hidden");
+        input.value = "";
+      }
+    }
+
+    function setWebViewSource(mode) {
+      const iframe = document.getElementById("webviewIframe");
+      const demo = document.getElementById("webviewDemoView");
+      const iframeBtn = document.getElementById("modeIframeBtn");
+      const demoBtn = document.getElementById("modeDemoBtn");
+
+      if (mode === "iframe" && CLASZON_CONFIG.webViewUrl) {
+        iframe.src = CLASZON_CONFIG.webViewUrl;
+        iframe.classList.remove("hidden");
+        demo.classList.add("hidden");
+        if (iframeBtn) iframeBtn.className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white cursor-pointer";
+        if (demoBtn) demoBtn.className = "px-2.5 py-1 rounded-md text-slate-300 hover:text-white cursor-pointer";
+      } else {
+        iframe.classList.add("hidden");
+        demo.classList.remove("hidden");
+        if (demoBtn) demoBtn.className = "px-2.5 py-1 rounded-md bg-indigo-600 text-white cursor-pointer";
+        if (iframeBtn) iframeBtn.className = "px-2.5 py-1 rounded-md text-slate-300 hover:text-white cursor-pointer";
+      }
+    }
+
+    function setViewportFrame(size) {
+      const box = document.getElementById("webviewFrameContainer");
+      const mobBtn = document.getElementById("frameMobileBtn");
+      const deskBtn = document.getElementById("frameDesktopBtn");
+      if (!box) return;
+
+      if (size === "mobile") {
+        box.className = "w-[390px] max-w-full h-[720px] max-h-full rounded-[32px] overflow-hidden border-2 border-indigo-400/40 bg-[#0B0D16] shadow-2xl transition-all duration-300";
+        if (mobBtn) mobBtn.className = "px-2.5 py-1 rounded-md bg-white/10 text-white cursor-pointer";
+        if (deskBtn) deskBtn.className = "px-2.5 py-1 rounded-md text-slate-300 hover:text-white cursor-pointer";
+      } else {
+        box.className = "w-full h-full max-w-6xl rounded-2xl overflow-hidden border border-indigo-400/25 bg-[#0B0D16] shadow-2xl transition-all duration-300";
+        if (deskBtn) deskBtn.className = "px-2.5 py-1 rounded-md bg-white/10 text-white cursor-pointer";
+        if (mobBtn) mobBtn.className = "px-2.5 py-1 rounded-md text-slate-300 hover:text-white cursor-pointer";
+      }
+    }
+
+    function openWebViewModal(mode = "iframe") {
+      const modal = document.getElementById("webviewModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      setWebViewSource(mode);
+    }
+
+    function closeWebViewModal() {
+      const modal = document.getElementById("webviewModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    applyConfig();
+    renderMatches("ALL");
+    renderDemoMatches();
+  </script>
+</body>
+</html>
